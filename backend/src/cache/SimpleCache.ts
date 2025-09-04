@@ -1,46 +1,30 @@
-// Simple in-memory cache with TTL
-interface CacheEntry {
-  data: any;
-  timestamp: number;
-  ttl: number;
-}
+type CacheEntry = { data: any; expires: number };
 
 export class SimpleCache {
-  private cache: Map<string, CacheEntry> = new Map();
+  private cache = new Map<string, CacheEntry>();
 
-  set(key: string, data: any, ttlSeconds: number = 300): void {
-    this.cache.set(key, {
-      data,
-      timestamp: Date.now(),
-      ttl: ttlSeconds * 1000,
-    });
+  set(key: string, data: any, ttlSec = 300) {
+    this.cache.set(key, { data, expires: Date.now() + ttlSec * 1000 });
   }
 
-  get(key: string): any | null {
+  get(key: string) {
     const entry = this.cache.get(key);
-    if (!entry) return null;
-
-    // Check if expired
-    if (Date.now() - entry.timestamp > entry.ttl) {
+    if (!entry || Date.now() > entry.expires) {
       this.cache.delete(key);
       return null;
     }
-
     return entry.data;
   }
 
-  delete(key: string): void {
+  delete(key: string) {
     this.cache.delete(key);
   }
 
-  clear(): void {
+  clear() {
     this.cache.clear();
   }
 
-  getStats(): { size: number; keys: string[] } {
-    return {
-      size: this.cache.size,
-      keys: Array.from(this.cache.keys()),
-    };
+  getStats() {
+    return { size: this.cache.size, keys: [...this.cache.keys()] };
   }
 }

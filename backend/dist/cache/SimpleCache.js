@@ -1,18 +1,11 @@
 export class SimpleCache {
     cache = new Map();
-    set(key, data, ttlSeconds = 300) {
-        this.cache.set(key, {
-            data,
-            timestamp: Date.now(),
-            ttl: ttlSeconds * 1000,
-        });
+    set(key, data, ttlSec = 300) {
+        this.cache.set(key, { data, expires: Date.now() + ttlSec * 1000 });
     }
     get(key) {
         const entry = this.cache.get(key);
-        if (!entry)
-            return null;
-        // Check if expired
-        if (Date.now() - entry.timestamp > entry.ttl) {
+        if (!entry || Date.now() > entry.expires) {
             this.cache.delete(key);
             return null;
         }
@@ -25,10 +18,7 @@ export class SimpleCache {
         this.cache.clear();
     }
     getStats() {
-        return {
-            size: this.cache.size,
-            keys: Array.from(this.cache.keys()),
-        };
+        return { size: this.cache.size, keys: [...this.cache.keys()] };
     }
 }
 //# sourceMappingURL=SimpleCache.js.map
