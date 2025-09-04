@@ -1,0 +1,109 @@
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { type Neo } from './types';
+
+const API_BASE = 'http://localhost:3000';
+
+const App: React.FC = () => {
+  const today = new Date().toISOString().split('T')[0];
+
+  const [startDate, setStartDate] = useState<string>(today);
+  const [endDate, setEndDate]     = useState<string>(today);
+  const [neos, setNeos]           = useState<Neo[]>([]);
+  const [loading, setLoading]     = useState<boolean>(false);
+  const [error, setError]         = useState<string>('');
+
+  const fetchNeos = async () => {
+    setLoading(true);
+    setError('');
+
+    try {
+      const resp = await axios.get<Neo[]>(API_BASE, {
+        params: { start_date: startDate, end_date: endDate }
+      });
+      setNeos(resp.data);
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch on mount
+  useEffect(() => {
+    fetchNeos();
+  }, []);
+
+  return (
+    <div style={{ padding: 20, fontFamily: 'sans-serif' }}>
+      <h1>NASA Near-Earth Objects</h1>
+
+      <div style={{ marginBottom: 20 }}>
+        <label>
+          Start Date:&nbsp;
+          <input
+            type="date"
+            value={startDate}
+            onChange={e => setStartDate(e.target.value)}
+          />
+        </label>
+
+        <label style={{ marginLeft: 20 }}>
+          End Date:&nbsp;
+          <input
+            type="date"
+            value={endDate}
+            onChange={e => setEndDate(e.target.value)}
+          />
+        </label>
+
+        <button
+          style={{ marginLeft: 20 }}
+          onClick={fetchNeos}
+          disabled={loading}
+        >
+          {loading ? 'Loading…' : 'Fetch'}
+        </button>
+      </div>
+
+      {error && <p style={{ color: 'red' }}>{error}</p>}
+
+      {!error && (
+        <table
+          style={{
+            borderCollapse: 'collapse',
+            width: '100%',
+            textAlign: 'left'
+          }}
+        >
+          <thead>
+            <tr>
+              <th style={{ borderBottom: '1px solid #ccc' }}>Name</th>
+              <th style={{ borderBottom: '1px solid #ccc' }}>Size (m)</th>
+              <th style={{ borderBottom: '1px solid #ccc' }}>Missed By (km)</th>
+              <th style={{ borderBottom: '1px solid #ccc' }}>Velocity (km/h)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {neos.map((neo, idx) => (
+              <tr key={idx}>
+                <td style={{ padding: '8px 4px' }}>{neo.name}</td>
+                <td style={{ padding: '8px 4px' }}>
+                  {neo.sizeMeters.min.toFixed(1)} – {neo.sizeMeters.max.toFixed(1)}
+                </td>
+                <td style={{ padding: '8px 4px' }}>
+                  {neo.closestKm.toFixed(0)}
+                </td>
+                <td style={{ padding: '8px 4px' }}>
+                  {neo.velocityKph.toFixed(0)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+};
+
+export default App;
