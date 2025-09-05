@@ -68,7 +68,7 @@ tsconfig.json
 1. Clone & install:
 
    ```bash
-   git clone <repo-url>
+   git clone
    cd backend
    npm install
 
