@@ -71,31 +71,34 @@ const App: React.FC = () => {
 
   // 8 — Render UI
   return (
-    <Container className='d-flex flex-column justify-content-center align-items-center'>
+  
+    <Container className='mt-5 text-center'>
+      <h1 className='mb-5 text-primary'>NASA Near-Earth Objects</h1>
       
-      <h1 className='mb-3 text-primary'>NASA Near-Earth Objects</h1>
-      
-        <div className='d-flex flex-row justify-content-center align-items-start'>
+      <div className='d-flex flex-row justify-content-center mb-5 gap-5'> 
+         
           {/* Date Pickers & Fetch Button */}
-          
-          <div className='me-5'>
-            <label>
+          <div className='me-5 d-flex flex-row align-items-end'>
+            
+            <label className='me-2'>
               Start:&nbsp;
               <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} />
             </label>
-            <label style={{ marginLeft: 16 }}>
+            
+            <label className='me-2'>
               End:&nbsp;
               <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} />
             </label>
             
-            <Button className="btn btn-primary ms-2 " onClick={fetchNeos} disabled={loading}>
+            <Button className="btn btn-primary" onClick={fetchNeos} disabled={loading}>
               {loading ? 'Loading…' : 'Fetch'}
             </Button>
           </div>
 
           {/* Sort Controls */}
-          <div className='mb-5 d-flex flex-row align-items-start me-5'>
-            <label>
+          <div className='me-5 d-flex flex-row align-items-end '>
+            
+            <label className='me-2'>
               Sort by:&nbsp;
               <select value={sortKey} onChange={e => setSortKey(e.target.value as SortKey)}>
                 <option value="size">Size</option>
@@ -104,12 +107,12 @@ const App: React.FC = () => {
               </select>
             </label>
 
-            <Button onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}>
+            <Button className="btn btn-primary" onClick={() => setSortOrder(prev => (prev === 'asc' ? 'desc' : 'asc'))}>
               {sortOrder === 'asc' ? '⬆️ Ascending' : '⬇️ Descending'}
             </Button>
           </div>
         </div>
-    
+
       {/* Error Message */}
       {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
@@ -144,8 +147,9 @@ const App: React.FC = () => {
             </div>
         </div>
       )}
-  
     </Container>
+ 
+  
   );
 };
 
